@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>City Radar</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg:#0a0b0e; --surface:#111318; --surface-2:#181b22; --surface-3:#1f232c;
+    --border:#22262e; --border-strong:#2c313a;
+    --text:#ecedf1; --text-muted:#9ca3af; --text-subtle:#6b7280;
+    --accent:#5e6ad2; --accent-hover:#7079e0; --accent-soft:rgba(94,106,210,.14);
+    --ok:#34d399; --warn:#f59e0b; --err:#f87171;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+    --r:10px; --r-lg:14px; --shadow:0 4px 16px rgba(0,0,0,.4);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  *:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  body {
+    font-family:var(--font); background:var(--bg); color:var(--text);
+    min-height:100vh; -webkit-font-smoothing:antialiased; letter-spacing:-.005em;
+  }
+  #app { max-width:760px; margin:0 auto; padding:28px 16px 108px; }
+  header { margin:6px 0 8px; }
+  header h1 {
+    font-size:26px; font-weight:600; margin-bottom:8px; letter-spacing:-.025em;
+    display:flex; align-items:center; gap:14px;
+  }
+  header h1::before {
+    content:''; width:6px; height:24px; border-radius:3px;
+    background:linear-gradient(180deg,var(--accent) 0%,#8b94e8 100%);
+  }
+  header p.sub { color:var(--text-muted); font-size:14px; line-height:1.5; }
+  .switch { display:flex; gap:8px; margin:16px 0 4px; }
+  .switch button {
+    font-family:var(--font); font-size:13px; font-weight:600; padding:8px 16px;
+    border-radius:999px; border:1px solid var(--border-strong); background:var(--surface);
+    color:var(--text-muted); cursor:pointer; transition:all .15s;
+  }
+  .switch button.active { border-color:var(--accent); background:var(--accent-soft); color:var(--accent-hover); }
+  .switch button:hover { color:var(--text); }
+  .counts { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0 4px; }
+  .chip {
+    font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted);
+  }
+  #pickedChip { background:var(--accent-soft); border-color:var(--accent); color:var(--accent-hover); }
+  .note {
+    background:var(--surface); border:1px solid var(--border-strong);
+    border-left:3px solid var(--warn); border-radius:var(--r);
+    padding:14px 16px; margin:18px 0; font-size:13px; color:var(--text-muted); line-height:1.55;
+  }
+  h3.tier {
+    font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--text-muted); margin:30px 0 12px;
+  }
+  .card {
+    position:relative; display:flex; gap:14px; align-items:flex-start;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg);
+    padding:16px 16px 16px 14px; margin-bottom:12px;
+    transition:border-color .15s,background .15s;
+  }
+  .card.picked { border-color:var(--accent); background:var(--surface-2); }
+  .tickwrap { flex:0 0 auto; padding-top:2px; cursor:pointer; }
+  .tick {
+    width:24px; height:24px; border-radius:7px; border:2px solid var(--border-strong);
+    background:transparent; display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s,background .15s;
+  }
+  .card.picked .tick { border-color:var(--accent); background:var(--accent); }
+  .tick svg { width:14px; height:14px; opacity:0; transition:opacity .12s; }
+  .card.picked .tick svg { opacity:1; }
+  .body { flex:1 1 auto; min-width:0; }
+  .row1 { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; cursor:pointer; }
+  .name { font-size:16px; font-weight:600; letter-spacing:-.01em; }
+  .sector { font-size:12px; color:var(--text-subtle); }
+  .why { font-size:13.5px; color:var(--text-muted); line-height:1.55; margin:7px 0 10px; }
+  .meta { display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+  .tag {
+    font-size:11px; font-weight:500; padding:3px 9px; border-radius:999px;
+    background:var(--surface-3); border:1px solid var(--border); color:var(--text-muted);
+  }
+  .tag.em { color:#6ee7c7; }
+  a.tag.li {
+    display:inline-flex; align-items:center; gap:5px; text-decoration:none;
+    color:#7eb0f0; border-color:rgba(10,102,194,.5); background:rgba(10,102,194,.12);
+  }
+  a.tag.li:hover { background:rgba(10,102,194,.22); border-color:#0a66c2; }
+  a.tag.li svg { width:12px; height:12px; flex:none; }
+  .tag.role { color:var(--text); }
+  button.draftbtn {
+    font-family:var(--font); font-size:11px; font-weight:600; padding:4px 11px; border-radius:999px;
+    border:1px solid var(--border-strong); background:var(--surface-2); color:var(--accent-hover); cursor:pointer;
+  }
+  button.draftbtn:hover { border-color:var(--accent); background:var(--accent-soft); }
+  textarea.comment {
+    width:100%; margin-top:10px; font-family:var(--font); font-size:13px; line-height:1.5;
+    color:var(--text); background:var(--surface-2); border:1px solid var(--border);
+    border-radius:var(--r); padding:9px 11px; resize:vertical; min-height:38px;
+  }
+  textarea.comment::placeholder { color:var(--text-subtle); }
+  textarea.comment:focus { border-color:var(--accent); outline:none; }
+  .actions {
+    position:fixed; left:0; right:0; bottom:0; background:rgba(10,11,14,.86);
+    backdrop-filter:blur(12px); border-top:1px solid var(--border);
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom)); display:none; justify-content:center;
+  }
+  .actions-inner { width:100%; max-width:760px; display:flex; gap:10px; align-items:center; }
+  .actions .summary { font-size:13px; color:var(--text-muted); flex:1 1 auto; }
+  .actions .summary b { color:var(--text); }
+  button.send {
+    font-family:var(--font); font-size:13px; font-weight:600; padding:10px 16px;
+    border-radius:var(--r); border:1px solid var(--accent); background:var(--accent); color:#fff; cursor:pointer;
+  }
+  button.send:hover { background:var(--accent-hover); }
+  button.clear {
+    font-family:var(--font); font-size:13px; font-weight:500; padding:10px 14px;
+    border-radius:var(--r); border:1px solid var(--border-strong); background:transparent; color:var(--text-muted); cursor:pointer;
+  }
+  footer { margin-top:26px; font-size:11px; color:var(--text-subtle); line-height:1.6; }
+  .overlay {
+    position:fixed; inset:0; background:rgba(4,5,7,.72); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; padding:18px; z-index:50;
+  }
+  .overlay.open { display:flex; }
+  .modal {
+    width:100%; max-width:600px; max-height:88vh; overflow:auto;
+    background:var(--surface); border:1px solid var(--border-strong); border-radius:var(--r-lg);
+    box-shadow:var(--shadow); padding:20px;
+  }
+  .modal h2 { font-size:17px; font-weight:600; margin-bottom:4px; }
+  .modal .msub { font-size:12.5px; color:var(--text-subtle); margin-bottom:14px; }
+  .modal label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-subtle); margin:12px 0 5px; }
+  .modal input, .modal textarea {
+    width:100%; font-family:var(--font); font-size:13.5px; line-height:1.55; color:var(--text);
+    background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r); padding:10px 12px;
+  }
+  .modal textarea { min-height:190px; resize:vertical; }
+  .modal .hint { font-size:12px; color:var(--warn); margin-top:6px; line-height:1.5; }
+  .modal .mbtns { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .modal .mbtns .grow { flex:1 1 auto; }
+  a.openmail, button.copybtn, button.closebtn {
+    font-family:var(--font); font-size:13px; font-weight:600; padding:10px 16px; border-radius:var(--r);
+    cursor:pointer; text-align:center; text-decoration:none;
+  }
+  a.openmail { background:var(--accent); border:1px solid var(--accent); color:#fff; }
+  a.openmail:hover { background:var(--accent-hover); }
+  button.copybtn { background:transparent; border:1px solid var(--border-strong); color:var(--text-muted); }
+  button.closebtn { background:transparent; border:1px solid var(--border-strong); color:var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <h1 id="title">City visit</h1>
+    <p class="sub" id="sub"></p>
+  </header>
+  <div class="switch" id="switch"></div>
+  <div class="counts">
+    <span class="chip" id="totalChip"></span>
+    <span class="chip" id="tierChip"></span>
+    <span class="chip" id="pickedChip">0 shortlisted</span>
+  </div>
+  <div class="note" id="note"></div>
+  <section id="list"></section>
+  <footer>
+    Indicative deeptech company map for the city — sector targets and local ecosystem, compiled from public sources. Tiers are a first-pass prioritisation. Tap the tick to shortlist, add a comment where useful, then <b>Send to Oliver</b> to return your input. "Draft approach email" opens a ready email in your own mail app.
+  </footer>
+</div>
+
+<div class="actions" id="actionBar">
+  <div class="actions-inner">
+    <span class="summary"><b id="pickCount">0</b> shortlisted</span>
+    <button class="clear" id="clearBtn">Clear</button>
+    <button class="send" id="sendBtn">Send to Oliver</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="mTitle">Draft approach email</h2>
+    <div class="msub" id="mCompany"></div>
+    <label>To</label>
+    <input id="mTo" type="text" placeholder="Add the recipient's verified address">
+    <div class="hint" id="mHint"></div>
+    <label>Subject</label>
+    <input id="mSubject" type="text">
+    <label>Body</label>
+    <textarea id="mBody"></textarea>
+    <div class="mbtns">
+      <a class="openmail grow" id="mOpen" href="#">Open in email drafts</a>
+      <button class="copybtn" id="mCopy">Copy</button>
+      <button class="closebtn" id="mClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const OLIVER_EMAIL = "oliver@markl.me";
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const TIER_LABELS = { 1:'🔥 Tier 1 — priority', 2:'👀 Tier 2 — worth a look', 3:'🤝 Tier 3 — ecosystem' };
+const LI_LOGO = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>';
+
+const CITIES = {
+  Eindhoven: {
+    city: "Eindhoven",
+    note: "Brainport Eindhoven is one of Europe's densest deeptech hubs — High Tech Campus, TU/e, ASML/NXP nearby — and now a NATO DIANA defence-innovation region. Tier 1 mixes scaled anchors with younger TU/e spin-offs.",
+    companies: [
+      {id:"ein-smart", tier:1, name:"SMART Photonics", sector:"Photonics / InP PIC foundry", why:"Europe's leading pure-play indium-phosphide photonic-chip foundry; TU/e-Philips spin-off scaling a 6-inch pilot line at High Tech Campus.", role:"CEO / CCO", channel:"email"},
+      {id:"ein-effect", tier:1, name:"EFFECT Photonics", sector:"Photonics / coherent optics", why:"TU/e spin-off; coherent optical PICs for AI/datacenter and edge networks. Extended Series D to ~$62m in 2025.", role:"CEO / Head of BD", channel:"email + LinkedIn"},
+      {id:"ein-axelera", tier:1, name:"Axelera AI", sector:"Semiconductors / edge-AI", why:"High Tech Campus edge-AI chipmaker; raised $250m in 2025, the largest European AI-semiconductor round.", role:"CEO / Corp Dev", channel:"LinkedIn"},
+      {id:"ein-manti", tier:1, name:"MantiSpectra", sector:"Photonics / spectral-sensing chip", why:"TU/e spin-off; near-infrared spectrometer-on-chip (ChipSense) - a material sensor in every pocket, moving to commercial scale.", role:"Founder / CEO", channel:"LinkedIn + email"},
+      {id:"ein-microalign", tier:1, name:"MicroAlign", sector:"Photonics / automated PIC alignment", why:"Automated photonic-chip alignment and assembly - a Brainport photonics-packaging enabler.", role:"Founder / CEO", channel:"LinkedIn"},
+      {id:"ein-eyeo", tier:1, name:"eyeo", sector:"Photonics / computational imaging", why:"High Tech Campus imaging-sensor startup; €40m Series A (2026) led by Innovation Industries with imec.xpand.", role:"CEO / BD", channel:"LinkedIn"},
+      {id:"ein-photonbridge", tier:1, name:"Photon Bridge", sector:"Photonics / PIC platform", why:"Modular de-integrated PIC platform separating active and passive components to cut cost and scale photonic-chip production for AI/telecom.", role:"Founder", channel:"LinkedIn"},
+      {id:"ein-aircision", tier:1, name:"Aircision", sector:"Photonics / free-space optical comms", why:"High Tech Campus; long-range free-space optical (laser) communication for network backhaul, with space relevance.", role:"CEO / BD", channel:"LinkedIn"},
+      {id:"ein-nxp", tier:2, name:"NXP Semiconductors", sector:"Semiconductors (corporate)", why:"Eindhoven-headquartered global chipmaker; a key strategic reference point and market node for the region.", role:"Corp Dev / M&A", channel:"LinkedIn"},
+      {id:"ein-demcon", tier:2, name:"Demcon", sector:"Robotics / mechatronics (defence & space)", why:"High-tech mechatronics group (1,000+ staff; Eindhoven and Enschede); robotics, optomechatronics, and defence & space systems.", role:"BD / M&A", channel:"email + LinkedIn"},
+      {id:"ein-avular", tier:2, name:"Avular", sector:"Robotics / autonomous mobile robots", why:"Eindhoven; developer platform for autonomous mobile robots and drones (dual-use).", role:"Founder / CEO", channel:"LinkedIn"},
+      {id:"ein-smartrobotics", tier:2, name:"Smart Robotics", sector:"Robotics / industrial automation", why:"Eindhoven; AI-driven pick-and-place and logistics robotics.", role:"CEO / BD", channel:"LinkedIn"},
+      {id:"ein-scil", tier:2, name:"SCIL Nanoimprint Solutions", sector:"Nano-imprint / advanced manufacturing", why:"Eindhoven; soft nano-imprint lithography with Philips heritage.", role:"CEO / BD", channel:"email"},
+      {id:"ein-morpho", tier:2, name:"Morphotonics", sector:"Nano-imprint / advanced manufacturing", why:"Veldhoven; large-area nano-imprint lithography.", role:"CEO / BD", channel:"LinkedIn"},
+      {id:"ein-lionvolt", tier:2, name:"LionVolt", sector:"Advanced materials / solid-state batteries", why:"TU/e spin-off at High Tech Campus; 3D solid-state battery technology.", role:"Founder / CEO", channel:"LinkedIn"},
+      {id:"ein-keiron", tier:2, name:"Keiron", sector:"MEMS / lab-on-chip diagnostics", why:"TNO Holst Centre spinout at High Tech Campus; lab-on-a-chip / microfluidics diagnostics (DeepTechXL-backed).", role:"Founder / CEO", channel:"LinkedIn"},
+      {id:"ein-photondelta", tier:3, name:"PhotonDelta", sector:"Integrated-photonics orchestrator", why:"Steward of the ~€1.1bn Dutch integrated-photonics programme - an entry point to the whole PIC value chain.", role:"MD / ecosystem lead", channel:"email"},
+      {id:"ein-photonventures", tier:3, name:"Photonventures", sector:"Photonics VC (€85m fund)", why:"Eindhoven photonics fund; portfolio includes MantiSpectra, MicroAlign and Vitrealab.", role:"Partner", channel:"email + LinkedIn"},
+      {id:"ein-defence-space", tier:3, name:"Brainport Defence & Space (NATO DIANA)", sector:"Defence / space innovation cluster", why:"Brainport's NATO DIANA-accredited defence & space hub, plus the €100m Security Fund - entry to the regional dual-use ecosystem.", role:"Programme lead", channel:"email"},
+      {id:"ein-hightechxl", tier:3, name:"HighTechXL / DeepTechXL", sector:"Deeptech venture builder + €100m fund", why:"High Tech Campus venture builder and fund (ASML/Philips/BOM/TNO-backed).", role:"Partner / MD", channel:"LinkedIn"},
+      {id:"ein-tue", tier:3, name:"TU/e - Center for Integrated Photonics", sector:"University / tech transfer", why:"Photonics and semiconductor research anchor; a source of spinouts and talent.", role:"Institute head / TTO", channel:"email"},
+      {id:"ein-bom", tier:3, name:"Brabantse Ontwikkelings Maatschappij (BOM)", sector:"Regional development agency / investor", why:"Brabant's public investor and co-investor across Brainport deeptech, including the defence Security Fund.", role:"Investment manager", channel:"email + LinkedIn"}
+    ]
+  },
+  Roden: {
+    city: "Roden",
+    note: "Roden is a small hub, so the radius is widened to Groningen (~30 min) and Twente/Enschede (~1.5h), where most of the Northern-Netherlands deeptech depth - and the defence/robotics cluster (Thales, Demcon) - sits.",
+    companies: [
+      {id:"rod-sencure", tier:1, name:"Sencure", sector:"Semiconductors / biosignal ASIC", why:"Roden-headquartered; the SNCE-800 chip captures EEG/ECG/EMG biosignals at up to ~15x lower power than comparable solutions - a fundable medical-semiconductor play.", role:"CEO / Head of BD", channel:"email"},
+      {id:"rod-qdi", tier:1, name:"QDI Systems", sector:"Semiconductors / X-ray & radiation detection", why:"Groningen (Zernike) spin-off; CMOS direct X-ray and radiation detectors, €5m Series A led by NOM.", role:"CEO / BD", channel:"LinkedIn + email"},
+      {id:"rod-thales", tier:1, name:"Thales Nederland", sector:"Defence / radar & naval systems", why:"Hengelo (Twente); the Netherlands' largest defence company - naval radar and combat systems. Strategic relationship and market intel.", role:"Corp Dev / M&A", channel:"LinkedIn"},
+      {id:"rod-demcon", tier:2, name:"Demcon", sector:"Robotics / mechatronics (defence & space)", why:"Enschede HQ (1,000+ staff, incl. a Groningen branch); robotics, optomechatronics, and defence & space systems.", role:"BD / M&A", channel:"email + LinkedIn"},
+      {id:"rod-aeronamic", tier:2, name:"Aeronamic", sector:"Aerospace & defence components", why:"Almelo (Twente); air-management systems and turbomachinery for aerospace and defence.", role:"BD", channel:"LinkedIn"},
+      {id:"rod-lionix", tier:2, name:"LioniX International", sector:"Photonics / SiN PICs", why:"Enschede; TriPleX silicon-nitride PIC leader, with microwave photonics for aerospace and defence.", role:"CEO / BD", channel:"email"},
+      {id:"rod-phix", tier:2, name:"PHIX Photonics Assembly", sector:"Photonics / PIC packaging", why:"Enschede; a photonic-chip packaging and assembly house serving the PIC ecosystem.", role:"Mgmt / BD", channel:"email + LinkedIn"},
+      {id:"rod-qtsense", tier:2, name:"QT Sense", sector:"Quantum sensing", why:"Groningen; quantum magnetic-field / magnetometry sensing.", role:"CEO / BD", channel:"LinkedIn"},
+      {id:"rod-quix", tier:2, name:"QuiX Quantum", sector:"Quantum / photonic processors", why:"Enschede; photonic quantum-computing processors.", role:"CEO / BD", channel:"LinkedIn"},
+      {id:"rod-micronit", tier:2, name:"Micronit", sector:"MEMS / microfluidics", why:"Enschede; microfluidics and MEMS foundry.", role:"BD / Mgmt", channel:"LinkedIn"},
+      {id:"rod-nom", tier:3, name:"NOM", sector:"Investment & Development Agency N-NL", why:"Groningen public investor active across Northern-Netherlands deeptech deal flow.", role:"Investment manager", channel:"email"},
+      {id:"rod-cottonwood", tier:3, name:"Cottonwood Technology Fund", sector:"Deeptech VC", why:"Enschede/Amsterdam early-stage deeptech VC across photonics, micro/nanoelectronics and sensors.", role:"Partner", channel:"LinkedIn"},
+      {id:"rod-twente-cluster", tier:3, name:"Twente Defence & Space cluster", sector:"Ecosystem (Univ. Twente / Twente Airport)", why:"Enschede robotics/unmanned-systems research plus Twente Airport / Technology Base test site - dual-use origination.", role:"Cluster / TTO lead", channel:"email"},
+      {id:"rod-zernike", tier:3, name:"University of Groningen - Zernike Institute / NanoLab", sector:"University / tech transfer", why:"Advanced-materials and nanofabrication anchor (Zernike NanoLab cleanroom); a source of spinouts.", role:"TTO / institute lead", channel:"email"}
+    ]
+  }
+};
+
+let currentCity = "Eindhoven";
+let DATA = null;
+let picked = new Set();
+let comments = {};
+
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function liUrl(name) { return 'https://www.linkedin.com/search/results/companies/?keywords=' + encodeURIComponent(name); }
+function pickKey() { return 'cityradar-share-' + (DATA.city || 'x').toLowerCase(); }
+function cmtKey() { return 'cityradar-cmt-' + (DATA.city || 'x').toLowerCase(); }
+function savePicks() { try { localStorage.setItem(pickKey(), JSON.stringify([...picked])); } catch(e){} }
+function saveComments() { try { localStorage.setItem(cmtKey(), JSON.stringify(comments)); } catch(e){} }
+
+function stickers(c) {
+  const ch = c.channel || '';
+  const hasLI = /linkedin/i.test(ch);
+  const hasEmail = /e-?mail|@/i.test(ch);
+  let out = '';
+  if (hasLI) out += '<a class="tag li" href="' + liUrl(c.name) + '" target="_blank" rel="noopener" title="LinkedIn">' + LI_LOGO + '<span>LinkedIn</span></a>';
+  if (hasEmail) out += '<span class="tag em">email</span>';
+  return out;
+}
+
+function updateCounts() {
+  const n = picked.size;
+  document.getElementById('pickCount').textContent = n;
+  document.getElementById('pickedChip').textContent = n + ' shortlisted';
+}
+
+function toggle(id, card) {
+  if (picked.has(id)) { picked.delete(id); card.classList.remove('picked'); }
+  else { picked.add(id); card.classList.add('picked'); }
+  savePicks(); updateCounts();
+}
+
+function render() {
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  [1,2,3].forEach(tier => {
+    const inTier = DATA.companies.filter(c => c.tier === tier);
+    if (!inTier.length) return;
+    const h = document.createElement('h3'); h.className = 'tier'; h.textContent = TIER_LABELS[tier];
+    list.appendChild(h);
+    inTier.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'card' + (picked.has(c.id) ? ' picked' : '');
+
+      const tickwrap = document.createElement('div');
+      tickwrap.className = 'tickwrap';
+      tickwrap.innerHTML = '<div class="tick">' + CHECK + '</div>';
+      tickwrap.addEventListener('click', () => toggle(c.id, card));
+
+      const body = document.createElement('div');
+      body.className = 'body';
+      const row1 = document.createElement('div');
+      row1.className = 'row1';
+      row1.innerHTML = '<span class="name">' + esc(c.name) + '</span><span class="sector">' + esc(c.sector) + '</span>';
+      row1.addEventListener('click', () => toggle(c.id, card));
+
+      const why = document.createElement('div');
+      why.className = 'why'; why.textContent = c.why;
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.innerHTML = '<span class="tag role">' + esc(c.role) + '</span>' + stickers(c);
+      const draftBtn = document.createElement('button');
+      draftBtn.className = 'draftbtn'; draftBtn.textContent = 'Draft approach email';
+      draftBtn.addEventListener('click', (e) => { e.stopPropagation(); openDraft(c); });
+      meta.appendChild(draftBtn);
+
+      const ta = document.createElement('textarea');
+      ta.className = 'comment';
+      ta.placeholder = 'Add a comment (optional) - returned when you click Send to Oliver';
+      ta.value = comments[c.id] || '';
+      ta.addEventListener('click', (e) => e.stopPropagation());
+      ta.addEventListener('input', () => {
+        const v = ta.value.trim();
+        if (v) comments[c.id] = v; else delete comments[c.id];
+        saveComments();
+      });
+
+      body.appendChild(row1);
+      body.appendChild(why);
+      body.appendChild(meta);
+      body.appendChild(ta);
+      card.appendChild(tickwrap);
+      card.appendChild(body);
+      list.appendChild(card);
+    });
+  });
+}
+
+function selectCity(name) {
+  currentCity = name;
+  DATA = CITIES[name];
+  try { picked = new Set(JSON.parse(localStorage.getItem(pickKey()) || '[]')); } catch(e){ picked = new Set(); }
+  try { comments = JSON.parse(localStorage.getItem(cmtKey()) || '{}'); } catch(e){ comments = {}; }
+  const counts = {1:0,2:0,3:0};
+  DATA.companies.forEach(c => counts[c.tier]++);
+  document.getElementById('title').textContent = 'City visit - ' + DATA.city;
+  document.getElementById('sub').innerHTML = 'Deeptech sector targets + local ecosystem.<br>Tick to shortlist, add comments, then Send to Oliver. Draft-email opens in your own mail app.';
+  document.getElementById('totalChip').textContent = DATA.companies.length + ' companies';
+  document.getElementById('tierChip').textContent = counts[1] + ' Tier 1 · ' + counts[2] + ' Tier 2 · ' + counts[3] + ' ecosystem';
+  document.getElementById('note').textContent = '⚠️ ' + DATA.note;
+  document.querySelectorAll('#switch button').forEach(b => b.classList.toggle('active', b.dataset.city === name));
+  render(); updateCounts();
+}
+
+function buildSwitch() {
+  const sw = document.getElementById('switch');
+  Object.keys(CITIES).forEach(name => {
+    const b = document.createElement('button');
+    b.textContent = name; b.dataset.city = name;
+    b.addEventListener('click', () => selectCity(name));
+    sw.appendChild(b);
+  });
+}
+
+function draftFor(c) {
+  const domain = (c.sector.split(' / ')[0] || 'deep tech').toLowerCase();
+  const firstWhy = (c.why.split('. ')[0] || '').trim();
+  const subject = c.name + ' x Pava - a short conversation?';
+  const body =
+    'Dear ' + c.role + ' at ' + c.name + ',\n\n' +
+    'I follow the ' + domain + ' space closely and have been impressed by ' + c.name + ' - ' + firstWhy + '. ' +
+    'I am a partner at Pava, a technology M&A advisory focused on deep tech (semiconductors, photonics, quantum, spacetech, robotics, defence), advising founders and shareholders on fundraises and exits.\n\n' +
+    'I will be in the region shortly and would value a brief, no-agenda conversation - comparing notes on the market and where ' + c.name + ' is heading. Would you have 30 minutes?\n\n' +
+    'Kind regards,\n[Your name]\nPava';
+  return { subject: subject, body: body };
+}
+
+let modalMail = '';
+function openDraft(c) {
+  const d = draftFor(c);
+  document.getElementById('mCompany').textContent = c.name + ' · ' + c.sector;
+  document.getElementById('mTo').value = '';
+  document.getElementById('mHint').textContent = 'Suggested contact: ' + c.role + '. Add their verified address before sending (this static page cannot look it up).';
+  document.getElementById('mSubject').value = d.subject;
+  document.getElementById('mBody').value = d.body;
+  refreshMailto();
+  document.getElementById('overlay').classList.add('open');
+}
+function refreshMailto() {
+  const to = encodeURIComponent(document.getElementById('mTo').value.trim());
+  const subject = encodeURIComponent(document.getElementById('mSubject').value);
+  const body = encodeURIComponent(document.getElementById('mBody').value);
+  modalMail = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+  document.getElementById('mOpen').setAttribute('href', modalMail);
+}
+['mTo','mSubject','mBody'].forEach(id => document.getElementById(id).addEventListener('input', refreshMailto));
+document.getElementById('mClose').addEventListener('click', () => document.getElementById('overlay').classList.remove('open'));
+document.getElementById('overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') document.getElementById('overlay').classList.remove('open'); });
+document.getElementById('mCopy').addEventListener('click', async () => {
+  const txt = 'To: ' + document.getElementById('mTo').value + '\nSubject: ' + document.getElementById('mSubject').value + '\n\n' + document.getElementById('mBody').value;
+  try { await navigator.clipboard.writeText(txt); const b = document.getElementById('mCopy'); b.textContent = 'Copied'; setTimeout(()=>b.textContent='Copy',1500); }
+  catch(e) { prompt('Copy the draft:', txt); }
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => { picked.clear(); savePicks(); render(); updateCounts(); });
+document.getElementById('sendBtn').addEventListener('click', () => {
+  const lines = ['City Radar feedback - ' + DATA.city, ''];
+  const chosen = DATA.companies.filter(c => picked.has(c.id));
+  lines.push('SHORTLISTED (' + chosen.length + '):');
+  if (chosen.length) chosen.forEach(c => {
+    lines.push('- ' + c.name + ' (' + c.sector + ')' + (comments[c.id] ? ' - ' + comments[c.id] : ''));
+  }); else lines.push('(none ticked)');
+  const otherComments = DATA.companies.filter(c => !picked.has(c.id) && comments[c.id]);
+  if (otherComments.length) {
+    lines.push(''); lines.push('OTHER COMMENTS:');
+    otherComments.forEach(c => lines.push('- ' + c.name + ' - ' + comments[c.id]));
+  }
+  lines.push(''); lines.push('- sent from City Radar');
+  const subject = encodeURIComponent('City Radar feedback - ' + DATA.city);
+  const body = encodeURIComponent(lines.join('\n'));
+  window.location.href = 'mailto:' + OLIVER_EMAIL + '?subject=' + subject + '&body=' + body;
+});
+
+buildSwitch();
+selectCity(currentCity);
+document.getElementById('actionBar').style.display = 'flex';
+</script>
+</body>
+</html>
