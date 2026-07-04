@@ -120,6 +120,7 @@
     border-radius:var(--r); border:1px solid var(--border-strong); background:transparent; color:var(--text-muted); cursor:pointer;
   }
   footer { margin-top:26px; font-size:11px; color:var(--text-subtle); line-height:1.6; }
+  /* modal */
   .overlay {
     position:fixed; inset:0; background:rgba(4,5,7,.72); backdrop-filter:blur(3px);
     display:none; align-items:center; justify-content:center; padding:18px; z-index:50;
@@ -209,48 +210,47 @@ const CITIES = {
     city: "Eindhoven",
     note: "Brainport Eindhoven is one of Europe's densest deeptech hubs — High Tech Campus, TU/e, ASML/NXP nearby — and now a NATO DIANA defence-innovation region. Tier 1 mixes scaled anchors with younger TU/e spin-offs.",
     companies: [
-      {id:"ein-smart", tier:1, name:"SMART Photonics", sector:"Photonics / InP PIC foundry", why:"Europe's leading pure-play indium-phosphide photonic-chip foundry; TU/e-Philips spin-off scaling a 6-inch pilot line at High Tech Campus.", role:"CEO / CCO", channel:"email"},
-      {id:"ein-effect", tier:1, name:"EFFECT Photonics", sector:"Photonics / coherent optics", why:"TU/e spin-off; coherent optical PICs for AI/datacenter and edge networks. Extended Series D to ~$62m in 2025.", role:"CEO / Head of BD", channel:"email + LinkedIn"},
+      {id:"ein-smart", tier:1, name:"SMART Photonics", sector:"Photonics / InP PIC foundry", why:"Europe's leading pure-play indium-phosphide photonic-chip foundry; TU/e–Philips spin-off scaling a 6-inch pilot line at High Tech Campus.", role:"CEO / CCO", channel:"email"},
+      {id:"ein-effect", tier:1, name:"EFFECT Photonics", sector:"Photonics / coherent optics", why:"TU/e spin-off; coherent optical PICs for AI/datacenter and edge networks. Extended Series D to ~$62m in 2025.", role:"CEO / Head of BD", channel:"email → LinkedIn"},
       {id:"ein-axelera", tier:1, name:"Axelera AI", sector:"Semiconductors / edge-AI", why:"High Tech Campus edge-AI chipmaker; raised $250m in 2025, the largest European AI-semiconductor round.", role:"CEO / Corp Dev", channel:"LinkedIn"},
-      {id:"ein-manti", tier:1, name:"MantiSpectra", sector:"Photonics / spectral-sensing chip", why:"TU/e spin-off; near-infrared spectrometer-on-chip (ChipSense) - a material sensor in every pocket, moving to commercial scale.", role:"Founder / CEO", channel:"LinkedIn + email"},
-      {id:"ein-microalign", tier:1, name:"MicroAlign", sector:"Photonics / automated PIC alignment", why:"Automated photonic-chip alignment and assembly - a Brainport photonics-packaging enabler.", role:"Founder / CEO", channel:"LinkedIn"},
+      {id:"ein-manti", tier:1, name:"MantiSpectra", sector:"Photonics / spectral-sensing chip", why:"TU/e spin-off; near-infrared spectrometer-on-chip (ChipSense) — 'a material sensor in every pocket,' moving to commercial scale.", role:"Founder / CEO", channel:"LinkedIn → email"},
+      {id:"ein-microalign", tier:1, name:"MicroAlign", sector:"Photonics / automated PIC alignment", why:"Automated photonic-chip alignment and assembly — a Brainport photonics-packaging enabler.", role:"Founder / CEO", channel:"LinkedIn"},
       {id:"ein-eyeo", tier:1, name:"eyeo", sector:"Photonics / computational imaging", why:"High Tech Campus imaging-sensor startup; €40m Series A (2026) led by Innovation Industries with imec.xpand.", role:"CEO / BD", channel:"LinkedIn"},
-      {id:"ein-photonbridge", tier:1, name:"Photon Bridge", sector:"Photonics / PIC platform", why:"Modular de-integrated PIC platform separating active and passive components to cut cost and scale photonic-chip production for AI/telecom.", role:"Founder", channel:"LinkedIn"},
+      {id:"ein-photonbridge", tier:1, name:"Photon Bridge", sector:"Photonics / PIC platform", why:"Modular 'de-integrated' PIC platform separating active and passive components to cut cost and scale photonic-chip production for AI/telecom.", role:"Founder", channel:"LinkedIn"},
       {id:"ein-aircision", tier:1, name:"Aircision", sector:"Photonics / free-space optical comms", why:"High Tech Campus; long-range free-space optical (laser) communication for network backhaul, with space relevance.", role:"CEO / BD", channel:"LinkedIn"},
       {id:"ein-nxp", tier:2, name:"NXP Semiconductors", sector:"Semiconductors (corporate)", why:"Eindhoven-headquartered global chipmaker; a key strategic reference point and market node for the region.", role:"Corp Dev / M&A", channel:"LinkedIn"},
-      {id:"ein-demcon", tier:2, name:"Demcon", sector:"Robotics / mechatronics (defence & space)", why:"High-tech mechatronics group (1,000+ staff; Eindhoven and Enschede); robotics, optomechatronics, and defence & space systems.", role:"BD / M&A", channel:"email + LinkedIn"},
+      {id:"ein-demcon", tier:2, name:"Demcon", sector:"Robotics / mechatronics (defence & space)", why:"High-tech mechatronics group (1,000+ staff; Eindhoven and Enschede); robotics, optomechatronics, and defence & space systems.", role:"BD / M&A", channel:"email → LinkedIn"},
       {id:"ein-avular", tier:2, name:"Avular", sector:"Robotics / autonomous mobile robots", why:"Eindhoven; developer platform for autonomous mobile robots and drones (dual-use).", role:"Founder / CEO", channel:"LinkedIn"},
       {id:"ein-smartrobotics", tier:2, name:"Smart Robotics", sector:"Robotics / industrial automation", why:"Eindhoven; AI-driven pick-and-place and logistics robotics.", role:"CEO / BD", channel:"LinkedIn"},
       {id:"ein-scil", tier:2, name:"SCIL Nanoimprint Solutions", sector:"Nano-imprint / advanced manufacturing", why:"Eindhoven; soft nano-imprint lithography with Philips heritage.", role:"CEO / BD", channel:"email"},
       {id:"ein-morpho", tier:2, name:"Morphotonics", sector:"Nano-imprint / advanced manufacturing", why:"Veldhoven; large-area nano-imprint lithography.", role:"CEO / BD", channel:"LinkedIn"},
       {id:"ein-lionvolt", tier:2, name:"LionVolt", sector:"Advanced materials / solid-state batteries", why:"TU/e spin-off at High Tech Campus; 3D solid-state battery technology.", role:"Founder / CEO", channel:"LinkedIn"},
       {id:"ein-keiron", tier:2, name:"Keiron", sector:"MEMS / lab-on-chip diagnostics", why:"TNO Holst Centre spinout at High Tech Campus; lab-on-a-chip / microfluidics diagnostics (DeepTechXL-backed).", role:"Founder / CEO", channel:"LinkedIn"},
-      {id:"ein-photondelta", tier:3, name:"PhotonDelta", sector:"Integrated-photonics orchestrator", why:"Steward of the ~€1.1bn Dutch integrated-photonics programme - an entry point to the whole PIC value chain.", role:"MD / ecosystem lead", channel:"email"},
-      {id:"ein-photonventures", tier:3, name:"Photonventures", sector:"Photonics VC (€85m fund)", why:"Eindhoven photonics fund; portfolio includes MantiSpectra, MicroAlign and Vitrealab.", role:"Partner", channel:"email + LinkedIn"},
-      {id:"ein-defence-space", tier:3, name:"Brainport Defence & Space (NATO DIANA)", sector:"Defence / space innovation cluster", why:"Brainport's NATO DIANA-accredited defence & space hub, plus the €100m Security Fund - entry to the regional dual-use ecosystem.", role:"Programme lead", channel:"email"},
+      {id:"ein-photondelta", tier:3, name:"PhotonDelta", sector:"Integrated-photonics orchestrator", why:"Steward of the ~€1.1bn Dutch integrated-photonics programme — an entry point to the whole PIC value chain.", role:"MD / ecosystem lead", channel:"email"},
+      {id:"ein-photonventures", tier:3, name:"Photonventures", sector:"Photonics VC (€85m fund)", why:"Eindhoven photonics fund; portfolio includes MantiSpectra, MicroAlign and Vitrealab.", role:"Partner", channel:"email → LinkedIn"},
+      {id:"ein-defence-space", tier:3, name:"Brainport Defence & Space (NATO DIANA)", sector:"Defence / space innovation cluster", why:"Brainport's NATO DIANA-accredited defence & space hub, plus the €100m Security Fund — entry to the regional dual-use ecosystem.", role:"Programme lead", channel:"email"},
       {id:"ein-hightechxl", tier:3, name:"HighTechXL / DeepTechXL", sector:"Deeptech venture builder + €100m fund", why:"High Tech Campus venture builder and fund (ASML/Philips/BOM/TNO-backed).", role:"Partner / MD", channel:"LinkedIn"},
-      {id:"ein-tue", tier:3, name:"TU/e - Center for Integrated Photonics", sector:"University / tech transfer", why:"Photonics and semiconductor research anchor; a source of spinouts and talent.", role:"Institute head / TTO", channel:"email"},
-      {id:"ein-bom", tier:3, name:"Brabantse Ontwikkelings Maatschappij (BOM)", sector:"Regional development agency / investor", why:"Brabant's public investor and co-investor across Brainport deeptech, including the defence Security Fund.", role:"Investment manager", channel:"email + LinkedIn"}
+      {id:"ein-tue", tier:3, name:"TU/e — Center for Integrated Photonics", sector:"University / tech transfer", why:"Photonics and semiconductor research anchor; a source of spinouts and talent.", role:"Institute head / TTO", channel:"email"},
+      {id:"ein-bom", tier:3, name:"Brabantse Ontwikkelings Maatschappij (BOM)", sector:"Regional development agency / investor", why:"Brabant's public investor and co-investor across Brainport deeptech, including the defence Security Fund.", role:"Investment manager", channel:"email → LinkedIn"}
     ]
   },
-  Roden: {
-    city: "Roden",
-    note: "Roden is a small hub, so the radius is widened to Groningen (~30 min) and Twente/Enschede (~1.5h), where most of the Northern-Netherlands deeptech depth - and the defence/robotics cluster (Thales, Demcon) - sits.",
+  Enschede: {
+    city: "Enschede",
+    note: "Enschede is the centre of the Twente deeptech cluster — a dense SiN-photonics and quantum scene (LioniX, New Origin, Aluvia PIC foundries; PHIX packaging; QuiX quantum), plus robotics/defence (Demcon, Aeronamic), MEMS (Micronit), drones/space (Space53) and the University of Twente MESA+ spinout engine.",
     companies: [
-      {id:"rod-sencure", tier:1, name:"Sencure", sector:"Semiconductors / biosignal ASIC", why:"Roden-headquartered; the SNCE-800 chip captures EEG/ECG/EMG biosignals at up to ~15x lower power than comparable solutions - a fundable medical-semiconductor play.", role:"CEO / Head of BD", channel:"email"},
-      {id:"rod-qdi", tier:1, name:"QDI Systems", sector:"Semiconductors / X-ray & radiation detection", why:"Groningen (Zernike) spin-off; CMOS direct X-ray and radiation detectors, €5m Series A led by NOM.", role:"CEO / BD", channel:"LinkedIn + email"},
-      {id:"rod-thales", tier:1, name:"Thales Nederland", sector:"Defence / radar & naval systems", why:"Hengelo (Twente); the Netherlands' largest defence company - naval radar and combat systems. Strategic relationship and market intel.", role:"Corp Dev / M&A", channel:"LinkedIn"},
-      {id:"rod-demcon", tier:2, name:"Demcon", sector:"Robotics / mechatronics (defence & space)", why:"Enschede HQ (1,000+ staff, incl. a Groningen branch); robotics, optomechatronics, and defence & space systems.", role:"BD / M&A", channel:"email + LinkedIn"},
-      {id:"rod-aeronamic", tier:2, name:"Aeronamic", sector:"Aerospace & defence components", why:"Almelo (Twente); air-management systems and turbomachinery for aerospace and defence.", role:"BD", channel:"LinkedIn"},
-      {id:"rod-lionix", tier:2, name:"LioniX International", sector:"Photonics / SiN PICs", why:"Enschede; TriPleX silicon-nitride PIC leader, with microwave photonics for aerospace and defence.", role:"CEO / BD", channel:"email"},
-      {id:"rod-phix", tier:2, name:"PHIX Photonics Assembly", sector:"Photonics / PIC packaging", why:"Enschede; a photonic-chip packaging and assembly house serving the PIC ecosystem.", role:"Mgmt / BD", channel:"email + LinkedIn"},
-      {id:"rod-qtsense", tier:2, name:"QT Sense", sector:"Quantum sensing", why:"Groningen; quantum magnetic-field / magnetometry sensing.", role:"CEO / BD", channel:"LinkedIn"},
-      {id:"rod-quix", tier:2, name:"QuiX Quantum", sector:"Quantum / photonic processors", why:"Enschede; photonic quantum-computing processors.", role:"CEO / BD", channel:"LinkedIn"},
-      {id:"rod-micronit", tier:2, name:"Micronit", sector:"MEMS / microfluidics", why:"Enschede; microfluidics and MEMS foundry.", role:"BD / Mgmt", channel:"LinkedIn"},
-      {id:"rod-nom", tier:3, name:"NOM", sector:"Investment & Development Agency N-NL", why:"Groningen public investor active across Northern-Netherlands deeptech deal flow.", role:"Investment manager", channel:"email"},
-      {id:"rod-cottonwood", tier:3, name:"Cottonwood Technology Fund", sector:"Deeptech VC", why:"Enschede/Amsterdam early-stage deeptech VC across photonics, micro/nanoelectronics and sensors.", role:"Partner", channel:"LinkedIn"},
-      {id:"rod-twente-cluster", tier:3, name:"Twente Defence & Space cluster", sector:"Ecosystem (Univ. Twente / Twente Airport)", why:"Enschede robotics/unmanned-systems research plus Twente Airport / Technology Base test site - dual-use origination.", role:"Cluster / TTO lead", channel:"email"},
-      {id:"rod-zernike", tier:3, name:"University of Groningen - Zernike Institute / NanoLab", sector:"University / tech transfer", why:"Advanced-materials and nanofabrication anchor (Zernike NanoLab cleanroom); a source of spinouts.", role:"TTO / institute lead", channel:"email"}
+      {id:"ens-lionix", tier:1, name:"LioniX International", sector:"Photonics / TriPleX SiN PIC foundry", why:"Global SiN PIC foundry moving to a new Enschede facility; recent €3.5M growth round — a follow-on M&A / strategic-consolidation candidate.", role:"CEO", channel:"email"},
+      {id:"ens-neworigin", tier:1, name:"New Origin", sector:"Photonics / SiN PIC foundry (pure-play)", why:"Pure-play photonic-chip foundry scaling imec's LPCVD silicon-nitride platform in Enschede (announced 2026); a strategically important European supply-chain node.", role:"CEO / Co-founder", channel:"LinkedIn → email"},
+      {id:"ens-phix", tier:1, name:"PHIX Photonics Assembly", sector:"Photonics / PIC packaging (OSAT)", why:"Europe's leading PIC assembly house — chip-to-module packaging across multiple platforms.", role:"CEO", channel:"email"},
+      {id:"ens-quix", tier:1, name:"QuiX Quantum", sector:"Quantum / photonic quantum processors", why:"Builds among the largest commercially available photonic quantum processors on SiN PICs; Series A raised in 2025.", role:"CEO", channel:"LinkedIn → email"},
+      {id:"ens-sencure", tier:1, name:"Sencure", sector:"Semiconductors / biosignal ASIC", why:"The SNCE-800 chip captures EEG/ECG/EMG biosignals at up to ~15× lower power than comparable solutions; senior management based in Enschede.", role:"CEO / Head of BD", channel:"email"},
+      {id:"ens-aluvia", tier:2, name:"Aluvia Photonics", sector:"Photonics / aluminium-oxide PIC foundry", why:"Supplier of PICs on the aluminium-oxide platform — a distinctive material differentiation in the photonics supply chain.", role:"CEO / Founder", channel:"LinkedIn"},
+      {id:"ens-brilliance", tier:2, name:"Brilliance", sector:"Photonics / laser-projection chips (AR/VR)", why:"Enschede fabless developing PIC chips for laser projection in AR/VR glasses.", role:"CEO", channel:"LinkedIn"},
+      {id:"ens-demcon", tier:2, name:"Demcon", sector:"Robotics / mechatronics (defence & space)", why:"Enschede-headquartered high-tech mechatronics group; robotics, optomechatronics and defence & space systems.", role:"BD / M&A", channel:"email"},
+      {id:"ens-micronit", tier:2, name:"Micronit", sector:"MEMS / microfluidics", why:"Enschede; microfluidics and MEMS foundry.", role:"BD / Mgmt", channel:"LinkedIn"},
+      {id:"ens-aeronamic", tier:2, name:"Aeronamic", sector:"Aerospace & defence components", why:"Almelo (Twente, ~20 min); air-management systems and turbomachinery for aerospace and defence.", role:"BD", channel:"LinkedIn"},
+      {id:"ens-cottonwood", tier:3, name:"Cottonwood Technology Fund", sector:"Deeptech VC", why:"Enschede/Amsterdam early-stage deeptech VC across photonics, micro/nanoelectronics and sensors.", role:"Partner", channel:"LinkedIn"},
+      {id:"ens-space53", tier:3, name:"Space53", sector:"Spacetech / drones — cluster & test facility", why:"Enschede's drone and urban-air-mobility hub at Twente Airport; gateway to the local drone/aerospace ecosystem.", role:"Director / Cluster Manager", channel:"email"},
+      {id:"ens-mesa", tier:3, name:"University of Twente — MESA+ Institute", sector:"University / nanofab & spinouts", why:"Source of most Enschede photonics and quantum spinouts (QuiX, LioniX and others); the tech-transfer office runs a large spinout portfolio.", role:"Tech Transfer / BD Lead", channel:"email"}
     ]
   }
 };
@@ -273,7 +273,7 @@ function stickers(c) {
   const hasEmail = /e-?mail|@/i.test(ch);
   let out = '';
   if (hasLI) out += '<a class="tag li" href="' + liUrl(c.name) + '" target="_blank" rel="noopener" title="LinkedIn">' + LI_LOGO + '<span>LinkedIn</span></a>';
-  if (hasEmail) out += '<span class="tag em">email</span>';
+  if (hasEmail) out += '<span class="tag em">✉ email</span>';
   return out;
 }
 
@@ -320,13 +320,13 @@ function render() {
       meta.className = 'meta';
       meta.innerHTML = '<span class="tag role">' + esc(c.role) + '</span>' + stickers(c);
       const draftBtn = document.createElement('button');
-      draftBtn.className = 'draftbtn'; draftBtn.textContent = 'Draft approach email';
+      draftBtn.className = 'draftbtn'; draftBtn.textContent = '✉ Draft approach email';
       draftBtn.addEventListener('click', (e) => { e.stopPropagation(); openDraft(c); });
       meta.appendChild(draftBtn);
 
       const ta = document.createElement('textarea');
       ta.className = 'comment';
-      ta.placeholder = 'Add a comment (optional) - returned when you click Send to Oliver';
+      ta.placeholder = 'Add a comment (optional) — returned when you click Send to Oliver';
       ta.value = comments[c.id] || '';
       ta.addEventListener('click', (e) => e.stopPropagation());
       ta.addEventListener('input', () => {
@@ -353,7 +353,7 @@ function selectCity(name) {
   try { comments = JSON.parse(localStorage.getItem(cmtKey()) || '{}'); } catch(e){ comments = {}; }
   const counts = {1:0,2:0,3:0};
   DATA.companies.forEach(c => counts[c.tier]++);
-  document.getElementById('title').textContent = 'City visit - ' + DATA.city;
+  document.getElementById('title').textContent = 'City visit — ' + DATA.city;
   document.getElementById('sub').innerHTML = 'Deeptech sector targets + local ecosystem.<br>Tick to shortlist, add comments, then Send to Oliver. Draft-email opens in your own mail app.';
   document.getElementById('totalChip').textContent = DATA.companies.length + ' companies';
   document.getElementById('tierChip').textContent = counts[1] + ' Tier 1 · ' + counts[2] + ' Tier 2 · ' + counts[3] + ' ecosystem';
@@ -372,15 +372,16 @@ function buildSwitch() {
   });
 }
 
+/* ---- draft approach email ---- */
 function draftFor(c) {
   const domain = (c.sector.split(' / ')[0] || 'deep tech').toLowerCase();
   const firstWhy = (c.why.split('. ')[0] || '').trim();
-  const subject = c.name + ' x Pava - a short conversation?';
+  const subject = c.name + ' × Pava — a short conversation?';
   const body =
     'Dear ' + c.role + ' at ' + c.name + ',\n\n' +
-    'I follow the ' + domain + ' space closely and have been impressed by ' + c.name + ' - ' + firstWhy + '. ' +
+    'I follow the ' + domain + ' space closely and have been impressed by ' + c.name + ' — ' + firstWhy + '. ' +
     'I am a partner at Pava, a technology M&A advisory focused on deep tech (semiconductors, photonics, quantum, spacetech, robotics, defence), advising founders and shareholders on fundraises and exits.\n\n' +
-    'I will be in the region shortly and would value a brief, no-agenda conversation - comparing notes on the market and where ' + c.name + ' is heading. Would you have 30 minutes?\n\n' +
+    'I will be in the region shortly and would value a brief, no-agenda conversation — comparing notes on the market and where ' + c.name + ' is heading. Would you have 30 minutes?\n\n' +
     'Kind regards,\n[Your name]\nPava';
   return { subject: subject, body: body };
 }
@@ -390,7 +391,7 @@ function openDraft(c) {
   const d = draftFor(c);
   document.getElementById('mCompany').textContent = c.name + ' · ' + c.sector;
   document.getElementById('mTo').value = '';
-  document.getElementById('mHint').textContent = 'Suggested contact: ' + c.role + '. Add their verified address before sending (this static page cannot look it up).';
+  document.getElementById('mHint').textContent = 'Suggested contact: ' + c.role + '. Add their verified address before sending (this static page can’t look it up).';
   document.getElementById('mSubject').value = d.subject;
   document.getElementById('mBody').value = d.body;
   refreshMailto();
@@ -408,25 +409,26 @@ document.getElementById('mClose').addEventListener('click', () => document.getEl
 document.getElementById('overlay').addEventListener('click', (e) => { if (e.target.id === 'overlay') document.getElementById('overlay').classList.remove('open'); });
 document.getElementById('mCopy').addEventListener('click', async () => {
   const txt = 'To: ' + document.getElementById('mTo').value + '\nSubject: ' + document.getElementById('mSubject').value + '\n\n' + document.getElementById('mBody').value;
-  try { await navigator.clipboard.writeText(txt); const b = document.getElementById('mCopy'); b.textContent = 'Copied'; setTimeout(()=>b.textContent='Copy',1500); }
+  try { await navigator.clipboard.writeText(txt); const b = document.getElementById('mCopy'); b.textContent = 'Copied ✓'; setTimeout(()=>b.textContent='Copy',1500); }
   catch(e) { prompt('Copy the draft:', txt); }
 });
 
+/* ---- send picks + comments back to Oliver ---- */
 document.getElementById('clearBtn').addEventListener('click', () => { picked.clear(); savePicks(); render(); updateCounts(); });
 document.getElementById('sendBtn').addEventListener('click', () => {
-  const lines = ['City Radar feedback - ' + DATA.city, ''];
+  const lines = ['City Radar feedback — ' + DATA.city, ''];
   const chosen = DATA.companies.filter(c => picked.has(c.id));
   lines.push('SHORTLISTED (' + chosen.length + '):');
   if (chosen.length) chosen.forEach(c => {
-    lines.push('- ' + c.name + ' (' + c.sector + ')' + (comments[c.id] ? ' - ' + comments[c.id] : ''));
+    lines.push('• ' + c.name + ' (' + c.sector + ')' + (comments[c.id] ? ' — ' + comments[c.id] : ''));
   }); else lines.push('(none ticked)');
   const otherComments = DATA.companies.filter(c => !picked.has(c.id) && comments[c.id]);
   if (otherComments.length) {
     lines.push(''); lines.push('OTHER COMMENTS:');
-    otherComments.forEach(c => lines.push('- ' + c.name + ' - ' + comments[c.id]));
+    otherComments.forEach(c => lines.push('• ' + c.name + ' — ' + comments[c.id]));
   }
-  lines.push(''); lines.push('- sent from City Radar');
-  const subject = encodeURIComponent('City Radar feedback - ' + DATA.city);
+  lines.push(''); lines.push('— sent from City Radar');
+  const subject = encodeURIComponent('City Radar feedback — ' + DATA.city);
   const body = encodeURIComponent(lines.join('\n'));
   window.location.href = 'mailto:' + OLIVER_EMAIL + '?subject=' + subject + '&body=' + body;
 });
